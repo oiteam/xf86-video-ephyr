@@ -49,12 +49,8 @@
 #include <xf86.h>
 #include <xf86Module.h>
 #include <xf86str.h>
-#include "xf86Xinput.h"
 
 #include "compat-api.h"
-
-#include "client.h"
-#include "ephyr_input.h"
 
 #define EPHYR_VERSION 0
 #define EPHYR_NAME "EPHYR"
@@ -134,16 +130,6 @@ _X_EXPORT DriverRec EPHYR = {
     0     /* PciProbe */
 };
 
-_X_EXPORT InputDriverRec EPHYRINPUT = {
-    1,
-    "ephyrinput",
-    NULL,
-    EphyrInputPreInit,
-    EphyrInputUnInit,
-    NULL,
-    0,
-};
-
 static XF86ModuleVersionInfo EphyrVersRec = {
     EPHYR_DRIVER_NAME,
     MODULEVENDORSTRING,
@@ -189,7 +175,6 @@ EphyrSetup(pointer module, pointer opts, int *errmaj, int *errmin) {
         setupDone = TRUE;
         
         xf86AddDriver(&EPHYR, module, HaveDriverFuncs);
-        xf86AddInputDriver(&EPHYRINPUT, module, 0);
         
         return (pointer)1;
     } else {
@@ -528,14 +513,6 @@ EphyrAddMode(ScrnInfoPtr pScrn, int width, int height) {
     return TRUE;
 }
 
-// Wrapper for timed call to EphyrInputLoadDriver.  Used with timer in order
-// to force the initialization to wait until the input core is initialized.
-static CARD32
-EphyrMouseTimer(OsTimerPtr timer, CARD32 time, pointer arg) {
-    EphyrInputLoadDriver(arg);
-    return 0;
-}
-
 static void
 EphyrBlockHandler(pointer data, OSTimePtr wt, pointer LastSelectMask) {
     EphyrClientPrivatePtr pEphyrClient = data;
@@ -580,10 +557,6 @@ static Bool EphyrScreenInit(SCREEN_INIT_ARGS_DECL)
         return FALSE;
     }
     
-    // Schedule the EphyrInputLoadDriver function to load once the
-    // input core is initialized.
-    TimerSet(NULL, 0, 1, EphyrMouseTimer, pEphyr->clientData);
-
     miClearVisualTypes();
     if (!miSetVisualTypesAndMasks(pScrn->depth,
                                   miGetDefaultVisualMask(pScrn->depth),
