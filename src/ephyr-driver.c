@@ -135,9 +135,10 @@ static SymTabRec EphyrChipsets[] = {
  * -title [title]       set the window title in the WM_NAME property
  */
 static OptionInfoRec EphyrOptions[] = {
-    { OPTION_DISPLAY, "Display", OPTV_STRING, {0}, FALSE },
-    { OPTION_ORIGIN,  "Origin",  OPTV_STRING, {0}, FALSE },
-    { -1,             NULL,      OPTV_NONE,   {0}, FALSE }
+    { OPTION_DISPLAY,    "Display",    OPTV_STRING, {0}, FALSE },
+    { OPTION_XAUTHORITY, "Xauthority", OPTV_STRING, {0}, FALSE },
+    { OPTION_ORIGIN,     "Origin",     OPTV_STRING, {0}, FALSE },
+    { -1,                NULL,         OPTV_NONE,   {0}, FALSE }
 };
 
 _X_EXPORT DriverRec EPHYR = {
@@ -359,6 +360,17 @@ static Bool EphyrPreInit(ScrnInfoPtr pScrn, int flags) {
     } else {
         pEphyr->displayName = NULL;
     }
+
+    if (xf86IsOptionSet(EphyrOptions, OPTION_XAUTHORITY)) {
+        pEphyr->Xauthority = xf86GetOptValString(EphyrOptions,
+                                                 OPTION_XAUTHORITY);
+        xf86DrvMsg(pScrn->scrnIndex, X_INFO, "Using Xauthority file \"%s\"\n",
+                   pEphyr->Xauthority);
+        setenv("XAUTHORITY", pEphyr->Xauthority, 1);
+    } else {
+        pEphyr->Xauthority = NULL;
+    }
+
 
     if (xf86IsOptionSet(EphyrOptions, OPTION_ORIGIN)) {
         originString = xf86GetOptValString(EphyrOptions, OPTION_ORIGIN);
