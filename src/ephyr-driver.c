@@ -94,14 +94,13 @@ Bool EphyrAddMode(ScrnInfoPtr pScrn, int width, int height);
 void EphyrPrintPscreen(ScrnInfoPtr p);
 void EphyrPrintMode(ScrnInfoPtr p, DisplayModePtr m);
 
-typedef enum
-{
+typedef enum {
     OPTION_DISPLAY,
+    OPTION_XAUTHORITY,
     OPTION_ORIGIN
 } EphyrOpts;
 
-typedef enum
-{
+typedef enum {
     EPHYR_CHIP
 } EphyrType;
 
