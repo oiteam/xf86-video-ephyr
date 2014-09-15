@@ -67,7 +67,7 @@ static void EphyrIdentify(int flags);
 static const OptionInfoRec *EphyrAvailableOptions(int chipid, int busid);
 static Bool EphyrProbe(DriverPtr drv, int flags);
 static Bool EphyrDriverFunc(ScrnInfoPtr pScrn, xorgDriverFuncOp op,
-                             pointer ptr);
+                            pointer ptr);
 
 static Bool EphyrPreInit(ScrnInfoPtr pScrn, int flags);
 static Bool EphyrScreenInit(SCREEN_INIT_ARGS_DECL);
@@ -78,7 +78,7 @@ static Bool EphyrEnterVT(VT_FUNC_ARGS_DECL);
 static void EphyrLeaveVT(VT_FUNC_ARGS_DECL);
 static void EphyrFreeScreen(FREE_SCREEN_ARGS_DECL);
 static ModeStatus EphyrValidMode(SCRN_ARG_TYPE arg, DisplayModePtr mode,
-                                  Bool verbose, int flags);
+                                 Bool verbose, int flags);
 
 static Bool EphyrSaveScreen(ScreenPtr pScreen, int mode);
 static Bool EphyrCreateScreenResources(ScreenPtr pScreen);
@@ -326,7 +326,7 @@ EphyrAllocatePrivate(ScrnInfoPtr pScrn)
 
     pScrn->driverPrivate = xnfcalloc(sizeof(EphyrPrivate), 1);
 
-    if (pScrn->driverPrivate == NULL)
+    if (!pScrn->driverPrivate)
         return FALSE;
 
     return TRUE;
@@ -389,7 +389,7 @@ EphyrPreInit(ScrnInfoPtr pScrn, int flags)
     if (xf86IsOptionSet(EphyrOptions, OPTION_DISPLAY))
     {
         pEphyr->displayName = xf86GetOptValString(EphyrOptions,
-                                                   OPTION_DISPLAY);
+                                                  OPTION_DISPLAY);
         xf86DrvMsg(pScrn->scrnIndex, X_INFO, "Using display \"%s\"\n",
                    pEphyr->displayName);
         setenv("DISPLAY", pEphyr->displayName, 1);
