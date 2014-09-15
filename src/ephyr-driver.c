@@ -108,9 +108,32 @@ static SymTabRec EphyrChipsets[] = {
     {-1,            NULL }
 };
 
-/* XXX: Shouldn't we allow EphyrClient to define options too? If some day we
- * port EphyrClient to something that's not Xlib/Xcb we might need to add some
- * custom options */
+/*
+ * Original Xephyr command-line options (for further reference):
+ *
+ * -parent <XID>        Use existing window as Xephyr root win
+ * -sw-cursor           Render cursors in software in Xephyr
+ * -fullscreen          Attempt to run Xephyr fullscreen
+ * -output <NAME>       Attempt to run Xephyr fullscreen (restricted to given output geometry)
+ * -grayscale           Simulate 8bit grayscale
+ * -resizeable          Make Xephyr windows resizeable
+ *
+ * #ifdef GLAMOR
+ * -glamor              Enable 2D acceleration using glamor
+ * -glamor_gles2        Enable 2D acceleration using glamor (with GLES2 only)
+ * #endif
+ *
+ * -fakexa              Simulate acceleration using software rendering
+ * -verbosity <level>   Set log verbosity level
+ *
+ * #ifdef GLXEXT
+ * -nodri               do not use DRI
+ * #endif
+ *
+ * -noxv                do not use XV
+ * -name [name]         define the name in the WM_CLASS property
+ * -title [title]       set the window title in the WM_NAME property
+ */
 static OptionInfoRec EphyrOptions[] = {
     { OPTION_DISPLAY, "Display", OPTV_STRING, {0}, FALSE },
     { OPTION_ORIGIN,  "Origin",  OPTV_STRING, {0}, FALSE },
