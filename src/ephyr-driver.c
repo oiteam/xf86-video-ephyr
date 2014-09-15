@@ -229,7 +229,7 @@ EphyrSetup(pointer module, pointer opts, int *errmaj, int *errmin)
 static void
 EphyrIdentify(int flags)
 {
-    xf86PrintChipsets(EPHYR_NAME, "Driver for ephyr servers",
+    xf86PrintChipsets(EPHYR_NAME, "Driver for nested Xorg servers",
                       EphyrChipsets);
 }
 
