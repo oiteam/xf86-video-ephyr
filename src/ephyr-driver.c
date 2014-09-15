@@ -97,7 +97,13 @@ void EphyrPrintMode(ScrnInfoPtr p, DisplayModePtr m);
 typedef enum {
     OPTION_DISPLAY,
     OPTION_XAUTHORITY,
-    OPTION_ORIGIN
+    OPTION_ORIGIN,
+    OPTION_PARENT,
+    OPTION_SWCURSOR,
+    OPTION_FULLSCREEN,
+    OPTION_OUTPUT,
+    OPTION_WMCLASS,
+    OPTION_WMNAME
 } EphyrOpts;
 
 typedef enum {
@@ -111,35 +117,42 @@ static SymTabRec EphyrChipsets[] = {
 
 /*
  * Original Xephyr command-line options (for further reference):
+ * Legend: [+] Implemented, [-] Not yet implemented, [0] Already present in Xorg.
  *
- * -parent <XID>        Use existing window as Xephyr root win
- * -sw-cursor           Render cursors in software in Xephyr
- * -fullscreen          Attempt to run Xephyr fullscreen
- * -output <NAME>       Attempt to run Xephyr fullscreen (restricted to given output geometry)
- * -grayscale           Simulate 8bit grayscale
- * -resizeable          Make Xephyr windows resizeable
+ * [+] -parent <XID>        Use existing window as Xephyr root win
+ * [+] -sw-cursor           Render cursors in software in Xephyr
+ * [+] -fullscreen          Attempt to run Xephyr fullscreen
+ * [+] -output <NAME>       Attempt to run Xephyr fullscreen (restricted to given output geometry)
+ * [-] -grayscale           Simulate 8bit grayscale
+ * [-] -resizeable          Make Xephyr windows resizeable
  *
  * #ifdef GLAMOR
- * -glamor              Enable 2D acceleration using glamor
- * -glamor_gles2        Enable 2D acceleration using glamor (with GLES2 only)
+ * [-] -glamor              Enable 2D acceleration using glamor
+ * [-] -glamor_gles2        Enable 2D acceleration using glamor (with GLES2 only)
  * #endif
  *
- * -fakexa              Simulate acceleration using software rendering
- * -verbosity <level>   Set log verbosity level
+ * [-] -fakexa              Simulate acceleration using software rendering
+ * [0] -verbosity <level>   Set log verbosity level
  *
  * #ifdef GLXEXT
- * -nodri               do not use DRI
+ * [-] -nodri               do not use DRI
  * #endif
  *
- * -noxv                do not use XV
- * -name [name]         define the name in the WM_CLASS property
- * -title [title]       set the window title in the WM_NAME property
+ * [-] -noxv                do not use XV
+ * [+] -name [name]         define the name in the WM_CLASS property
+ * [+] -title [title]       set the window title in the WM_NAME property
  */
 static OptionInfoRec EphyrOptions[] = {
-    { OPTION_DISPLAY,    "Display",    OPTV_STRING, {0}, FALSE },
-    { OPTION_XAUTHORITY, "Xauthority", OPTV_STRING, {0}, FALSE },
-    { OPTION_ORIGIN,     "Origin",     OPTV_STRING, {0}, FALSE },
-    { -1,                NULL,         OPTV_NONE,   {0}, FALSE }
+    { OPTION_DISPLAY,    "Display",    OPTV_STRING,  {0}, FALSE },
+    { OPTION_XAUTHORITY, "Xauthority", OPTV_STRING,  {0}, FALSE },
+    { OPTION_ORIGIN,     "Origin",     OPTV_STRING,  {0}, FALSE },
+    { OPTION_PARENT,     "Parent",     OPTV_STRING,  {0}, FALSE },
+    { OPTION_SWCURSOR,   "SWCursor",   OPTV_BOOLEAN, {0}, FALSE },
+    { OPTION_FULSCREEN,  "Fullscreen", OPTV_BOOLEAN, {0}, FALSE },
+    { OPTION_OUTPUT,     "Output",     OPTV_STRING,  {0}, FALSE },
+    { OPTION_WMCLASS,    "WMClass",    OPTV_STRING,  {0}, FALSE },
+    { OPTION_WMNAME,     "WMName",     OPTV_STRING,  {0}, FALSE },
+    { -1,                NULL,         OPTV_NONE,    {0}, FALSE }
 };
 
 _X_EXPORT DriverRec EPHYR = {
