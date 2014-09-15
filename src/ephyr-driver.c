@@ -355,6 +355,7 @@ static Bool EphyrPreInit(ScrnInfoPtr pScrn, int flags) {
                                                    OPTION_DISPLAY);
         xf86DrvMsg(pScrn->scrnIndex, X_INFO, "Using display \"%s\"\n",
                    pEphyr->displayName);
+        setenv("DISPLAY", pEphyr->displayName, 1);
     } else {
         pEphyr->displayName = NULL;
     }
