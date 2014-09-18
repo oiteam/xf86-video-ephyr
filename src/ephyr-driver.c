@@ -193,8 +193,15 @@ _X_EXPORT XF86ModuleData ephyrModuleData = {
 typedef struct EphyrPrivate
 {
     char *displayName;
+    char *Xauthority;
     int originX;
     int originY;
+    int parent;
+    Bool sw_cursor;
+    Bool fullscreen;
+    char *output;
+    char *wm_class;
+    char *wm_name;
     EphyrClientPrivatePtr clientData;
     CreateScreenResourcesProcPtr CreateScreenResources;
     CloseScreenProcPtr CloseScreen;
