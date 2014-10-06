@@ -105,8 +105,8 @@ typedef enum {
     OPTION_FULLSCREEN,
     OPTION_OUTPUT,
 #ifdef GLAMOR
-    OPTION_ACCELMETHOD,
     OPTION_NOACCEL,
+    OPTION_ACCELMETHOD,
 #endif
     OPTION_WMCLASS,
     OPTION_WMNAME
@@ -157,8 +157,8 @@ static OptionInfoRec EphyrOptions[] = {
     { OPTION_FULSCREEN,   "Fullscreen",      OPTV_BOOLEAN, {0}, FALSE },
     { OPTION_OUTPUT,      "Output",          OPTV_STRING,  {0}, FALSE },
 #ifdef GLAMOR
-    { OPTION_ACCELMETHOD, "AccelMethod",     OPTV_STRING,  {0}, FALSE },
     { OPTION_NOACCEL,     "NoAccel",         OPTV_BOOLEAN, {0}, FALSE },
+    { OPTION_ACCELMETHOD, "AccelMethod",     OPTV_STRING,  {0}, FALSE },
 #endif
     { OPTION_WMCLASS,     "WMClass",         OPTV_STRING,  {0}, FALSE },
     { OPTION_WMNAME,      "WMName",          OPTV_STRING,  {0}, FALSE },
@@ -206,12 +206,17 @@ typedef struct EphyrPrivate
     char *Xauthority;
     int originX;
     int originY;
-    int parent;
-    Bool sw_cursor;
+    xcb_window_t parent;
+    Bool swCursor;
     Bool fullscreen;
     char *output;
-    char *wm_class;
-    char *wm_name;
+#ifdef GLAMOR
+    Bool noAccel;
+    Bool useGlamor;
+    Bool useGlamorGLES2;
+#endif
+    char *wmClass;
+    char *wmName;
     EphyrClientPrivatePtr clientData;
     CreateScreenResourcesProcPtr CreateScreenResources;
     CloseScreenProcPtr CloseScreen;
@@ -382,6 +387,21 @@ EphyrPreInit(ScrnInfoPtr pScrn, int flags)
     }
 
     pEphyr = PEPHYR(pScrn);
+    pEphyr->displayName = NULL;
+    pEphyr->Xauthority = NULL;
+    pEphyr->originX = 0;
+    pEphyr->originY = 0;
+    pEphyr->parent = 0;
+    pEphyr->swCursor = FALSE;
+    pEphyr->fullscreen = FALSE;
+    pEphyr->output = NULL;
+#ifdef GLAMOR
+    pEphyr->noAccel = FALSE;
+    pEphyr->useGlamor = FALSE;
+    pEphyr->useGlamorGLES2 = FALSE;
+#endif
+    pEphyr->wmClass = NULL;
+    pEphyr->wmName = NULL;
 
     if (!xf86SetDepthBpp(pScrn, 0, 0, 0, Support24bppFb | Support32bppFb))
         return FALSE;
@@ -411,8 +431,6 @@ EphyrPreInit(ScrnInfoPtr pScrn, int flags)
                    pEphyr->displayName);
         setenv("DISPLAY", pEphyr->displayName, 1);
     }
-    else
-        pEphyr->displayName = NULL;
 
     if (xf86IsOptionSet(EphyrOptions, OPTION_XAUTHORITY))
     {
@@ -422,8 +440,6 @@ EphyrPreInit(ScrnInfoPtr pScrn, int flags)
                    pEphyr->Xauthority);
         setenv("XAUTHORITY", pEphyr->Xauthority, 1);
     }
-    else
-        pEphyr->Xauthority = NULL;
 
     if (xf86IsOptionSet(EphyrOptions, OPTION_ORIGIN))
     {
@@ -440,10 +456,65 @@ EphyrPreInit(ScrnInfoPtr pScrn, int flags)
         xf86DrvMsg(pScrn->scrnIndex, X_INFO, "Using origin x:%d y:%d\n",
                    pEphyr->originX, pEphyr->originY);
     }
-    else
+
+    if (xf86GetOptValULong(EphyrOptions, OPTION_PARENT, &pEphyr->parent))
+        xf86DrvMsg(pScrn->scrnIndex, X_INFO, "Using parent window id %#x\n",
+                   &pEphyr->parent);
+
+    if (xf86GetOptValBool(EphyrOptions, OPTION_SWCURSOR, &pEphyr->swCursor))
+        xf86DrvMsg(pScrn->scrnIndex, X_INFO, "Software cursor %s\n",
+                   pEphyr->swCursor ? "enabled" : "disabled");
+
+    if (xf86GetOptValBool(EphyrOptions, OPTION_FULLSCREEN, &pEphyr->fullscreen))
+        xf86DrvMsg(pScrn->scrnIndex, X_INFO, "Fullscreen mode %s\n",
+                   pEphyr->fullscreen ? "enabled" : "disabled");
+
+    if (xf86IsOptionSet(EphyrOptions, OPTION_OUTPUT))
     {
-        pEphyr->originX = 0;
-        pEphyr->originY = 0;
+        pEphyr->output = xf86GetOptValString(EphyrOptions,
+                                             OPTION_OUTPUT);
+        xf86DrvMsg(pScrn->scrnIndex, X_INFO, "Using RandR output \"%s\"\n",
+                   pEphyr->output);
+    }
+
+#ifdef GLAMOR
+    if (xf86GetOptValBool(EphyrOptions, OPTION_NOACCEL, &pEphyr->noAccel))
+        xf86DrvMsg(pScrn->scrnIndex, X_INFO, "Acceleration %s\n",
+                   pEphyr->noAccel ? "enabled" : "disabled");
+
+    if (!pEphyr->noAccel && xf86IsOptionSet(EphyrOptions, OPTION_ACCELMETHOD))
+    {
+        char *accelMethod;
+
+        accelMethod = xf86GetOptValString(EphyrOptions, OPTION_ACCELMETHOD);
+
+        if (!xf86NameCmp(accelMethod, "glamor"))
+        {
+            pEphyr->useGlamor = TRUE;
+            xf86DrvMsg(pScrn->scrnIndex, X_INFO, "Acceleration method: GLAMOR\n");
+        }
+        else if (!xf86NameCmp(accelMethod, "glamor-gles2"))
+        {
+            pEphyr->useGlamorGLES2 = TRUE;
+            xf86DrvMsg(pScrn->scrnIndex, X_INFO, "Acceleration method: GLAMOR (with GLES2 only)\n");
+        }
+    }
+#endif
+
+    if (xf86IsOptionSet(EphyrOptions, OPTION_WMCLASS))
+    {
+        pEphyr->wmClass = xf86GetOptValString(EphyrOptions,
+                                              OPTION_WMCLASS);
+        xf86DrvMsg(pScrn->scrnIndex, X_INFO, "Setting WM_CLASS property value \"%s\"\n",
+                   pEphyr->wmClass);
+    }
+
+    if (xf86IsOptionSet(EphyrOptions, OPTION_WMNAME))
+    {
+        pEphyr->wmName = xf86GetOptValString(EphyrOptions,
+                                             OPTION_WMNAME);
+        xf86DrvMsg(pScrn->scrnIndex, X_INFO, "Setting WM_NAME property value \"%s\"\n",
+                   pEphyr->wmName);
     }
 
     xf86ShowUnusedOptions(pScrn->scrnIndex, pScrn->options);
