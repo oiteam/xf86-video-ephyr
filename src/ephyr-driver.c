@@ -493,8 +493,9 @@ EphyrPreInit(ScrnInfoPtr pScrn, int flags)
             pEphyr->useGlamor = TRUE;
             xf86DrvMsg(pScrn->scrnIndex, X_INFO, "Acceleration method: GLAMOR\n");
         }
-        else if (!xf86NameCmp(accelMethod, "glamor-gles2"))
+        else if (!xf86NameCmp(accelMethod, "glamor_gles2"))
         {
+            pEphyr->useGlamor = TRUE;
             pEphyr->useGlamorGLES2 = TRUE;
             xf86DrvMsg(pScrn->scrnIndex, X_INFO, "Acceleration method: GLAMOR (with GLES2 only)\n");
         }
