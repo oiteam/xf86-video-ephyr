@@ -104,6 +104,10 @@ typedef enum {
     OPTION_SWCURSOR,
     OPTION_FULLSCREEN,
     OPTION_OUTPUT,
+#ifdef GLAMOR
+    OPTION_ACCELMETHOD,
+    OPTION_NOACCEL,
+#endif
     OPTION_WMCLASS,
     OPTION_WMNAME
 } EphyrOpts;
@@ -114,7 +118,7 @@ typedef enum {
 
 static SymTabRec EphyrChipsets[] = {
     { EPHYR_CHIP, "ephyr" },
-    {-1,            NULL }
+    { -1,         NULL }
 };
 
 /*
@@ -145,16 +149,20 @@ static SymTabRec EphyrChipsets[] = {
  * [+] -title [title]       set the window title in the WM_NAME property
  */
 static OptionInfoRec EphyrOptions[] = {
-    { OPTION_DISPLAY,    "Display",    OPTV_STRING,  {0}, FALSE },
-    { OPTION_XAUTHORITY, "Xauthority", OPTV_STRING,  {0}, FALSE },
-    { OPTION_ORIGIN,     "Origin",     OPTV_STRING,  {0}, FALSE },
-    { OPTION_PARENT,     "Parent",     OPTV_STRING,  {0}, FALSE },
-    { OPTION_SWCURSOR,   "SWCursor",   OPTV_BOOLEAN, {0}, FALSE },
-    { OPTION_FULSCREEN,  "Fullscreen", OPTV_BOOLEAN, {0}, FALSE },
-    { OPTION_OUTPUT,     "Output",     OPTV_STRING,  {0}, FALSE },
-    { OPTION_WMCLASS,    "WMClass",    OPTV_STRING,  {0}, FALSE },
-    { OPTION_WMNAME,     "WMName",     OPTV_STRING,  {0}, FALSE },
-    { -1,                NULL,         OPTV_NONE,    {0}, FALSE }
+    { OPTION_DISPLAY,     "Display",         OPTV_STRING,  {0}, FALSE },
+    { OPTION_XAUTHORITY,  "Xauthority",      OPTV_STRING,  {0}, FALSE },
+    { OPTION_ORIGIN,      "Origin",          OPTV_STRING,  {0}, FALSE },
+    { OPTION_PARENT,      "Parent",          OPTV_STRING,  {0}, FALSE },
+    { OPTION_SWCURSOR,    "SWCursor",        OPTV_BOOLEAN, {0}, FALSE },
+    { OPTION_FULSCREEN,   "Fullscreen",      OPTV_BOOLEAN, {0}, FALSE },
+    { OPTION_OUTPUT,      "Output",          OPTV_STRING,  {0}, FALSE },
+#ifdef GLAMOR
+    { OPTION_ACCELMETHOD, "AccelMethod",     OPTV_STRING,  {0}, FALSE },
+    { OPTION_NOACCEL,     "NoAccel",         OPTV_BOOLEAN, {0}, FALSE },
+#endif
+    { OPTION_WMCLASS,     "WMClass",         OPTV_STRING,  {0}, FALSE },
+    { OPTION_WMNAME,      "WMName",          OPTV_STRING,  {0}, FALSE },
+    { -1,                 NULL,              OPTV_NONE,    {0}, FALSE }
 };
 
 _X_EXPORT DriverRec EPHYR = {
