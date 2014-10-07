@@ -133,8 +133,8 @@ static SymTabRec NestedChipsets[] = {
  * [-] -resizeable          Make Xephyr windows resizeable
  *
  * #ifdef GLAMOR
- * [-] -glamor              Enable 2D acceleration using glamor
- * [-] -glamor_gles2        Enable 2D acceleration using glamor (with GLES2 only)
+ * [+] -glamor              Enable 2D acceleration using glamor
+ * [+] -glamor_gles2        Enable 2D acceleration using glamor (with GLES2 only)
  * #endif
  *
  * [-] -fakexa              Simulate acceleration using software rendering
