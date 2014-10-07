@@ -200,13 +200,15 @@ _X_EXPORT XF86ModuleData nestedModuleData = {
 };
 
 /* These stuff should be valid to all server generations */
+/* Eventually we should drop this struct in favour of
+ * Xephyr native ones */
 typedef struct NestedPrivate
 {
     char *displayName;
     char *Xauthority;
     int originX;
     int originY;
-    xcb_window_t parent;
+    unsigned long parent; /* xcb_window_t */
     Bool swCursor;
     Bool fullscreen;
     char *output;
